@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- name_id should be unique -->
+<!-- icon count must match rows * column multiplication -->
+<!-- grid generation is left to right and top to bottom for icon list -->
+<!-- type's value should match with enum values of "Assets\Scripts\Manager\LevelManager\IconType.cs" -->
+<Levels>
+    <Level name_id="Level 1" rows="2" column="2" match_needed_to_clear ="2">
+        <Icon type="A" />
+        <Icon type="B" />
+        <Icon type="B" />
+        <Icon type="A" />
+    </Level>
+    <Level name_id="Level 2" rows="2" column="3" match_needed_to_clear ="2">
+        <Icon type="C" />
+        <Icon type="E" />
+        <Icon type="C" />
+        <Icon type="D" />
+        <Icon type="E" />
+        <Icon type="D" />
+    </Level>
+    <Level name_id="Level 3" rows="3" column="3" match_needed_to_clear ="2">
+        <Icon type="C" />
+        <Icon type="E" />
+        <Icon type="C" />
+        <Icon type="D" />
+        <Icon type="None" />
+        <Icon type="E" />
+        <Icon type="D" />
+        <Icon type="B" />
+        <Icon type="B" />
+    </Level>
+    <Level name_id="Level 4" rows="5" column="6" match_needed_to_clear ="3">
+        <Icon type="C" />
+        <Icon type="E" />
+        <Icon type="C" />
+        <Icon type="D" />
+        <Icon type="E" />
+        <Icon type="D" />
+        <Icon type="A" />
+        <Icon type="B" />
+        <Icon type="C" />
+        <Icon type="B" />
+        <Icon type="E" />
+        <Icon type="D" />
+        <Icon type="C" />
+        <Icon type="A" />
+        <Icon type="C" />
+        <Icon type="D" />
+        <Icon type="E" />
+        <Icon type="A" />
+        <Icon type="C" />
+        <Icon type="A" />
+        <Icon type="A" />
+        <Icon type="B" />
+        <Icon type="B" />
+        <Icon type="D" />
+        <Icon type="B" />
+        <Icon type="E" />
+        <Icon type="A" />
+        <Icon type="D" />
+        <Icon type="E" />
+        <Icon type="B" />
+    </Level>
+</Levels>
