@@ -73,10 +73,9 @@ namespace Manager.Level
                 else
                 {
                     // incorrect combo, flip the cards
-
+                    IUIGrid.HideCurrentFlippedCards();
                     m_iCurrentOpenedCards = 0;
                     m_currentOpenIconType = IconType.None;
-                    StartCoroutine(FlipToHideCurrentOpenedCard());
                 }
             }
             CheckForLevelComplete();
@@ -114,13 +113,6 @@ namespace Manager.Level
             }
             Debug.Log("Level Completed");
             return true;
-        }
-
-        WaitForSeconds m_waitForFlipToHide = new WaitForSeconds(0.5f);
-        IEnumerator FlipToHideCurrentOpenedCard()
-        {
-            yield return m_waitForFlipToHide;
-            IUIGrid.HideCurrentFlippedCards();
         }
         #endregion
 

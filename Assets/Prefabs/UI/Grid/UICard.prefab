@@ -27,7 +27,7 @@ RectTransform:
   m_GameObject: {fileID: 2158589810850043713}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: -1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2158589812585633327}
@@ -148,6 +148,7 @@ GameObject:
   - component: {fileID: 2158589812585633321}
   - component: {fileID: 2158589812585633320}
   - component: {fileID: 2158589812585633323}
+  - component: {fileID: 1373031252140121083}
   m_Layer: 5
   m_Name: UICard
   m_TagString: Untagged
@@ -284,3 +285,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_textCardType: {fileID: 2158589810850043715}
   m_image: {fileID: 2158589812585633321}
+  m_animation: {fileID: 1373031252140121083}
+--- !u!111 &1373031252140121083
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2158589812585633326}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Animation: {fileID: 0}
+  m_Animations:
+  - {fileID: 7400000, guid: 8e391d27e9920904e827398d1965c63c, type: 2}
+  - {fileID: 7400000, guid: 047f1f1da70dab64daef2a7414ed8b58, type: 2}
+  m_WrapMode: 0
+  m_PlayAutomatically: 0
+  m_AnimatePhysics: 0
+  m_CullingType: 0

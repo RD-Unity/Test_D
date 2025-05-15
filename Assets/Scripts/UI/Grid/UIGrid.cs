@@ -1,7 +1,9 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Manager.Level;
 using Manager.UI;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -74,30 +76,41 @@ namespace UI.Grid
         }
         void IUIGrid.HideCurrentFlippedCards()
         {
-            foreach (UICard i_card in m_currentOpenedCard)
-            {
-                i_card.FlipToHideIcon();
-            }
-            m_currentOpenedCard.Clear();
+            StartCoroutine(IE_HideCurrentFlippedCards(new List<UICard>(m_currentOpenedCards)));
+            m_currentOpenedCards.Clear();
         }
         void IUIGrid.ClearCurrentFlippedCards()
         {
-            foreach (UICard i_card in m_currentOpenedCard)
-            {
-                i_card.Clear();
-            }
-            m_currentOpenedCard.Clear();
+            StartCoroutine(IE_ClearCurrentFlippedCards(new List<UICard>(m_currentOpenedCards)));
+            m_currentOpenedCards.Clear();
         }
         #endregion
 
 
         #region Card Interaction
-        List<UICard> m_currentOpenedCard = new List<UICard>();
+        List<UICard> m_currentOpenedCards = new List<UICard>();
         Action<IconType> m_onClickCard = null;
+        WaitForSeconds m_iWaitForHideClearTime = new WaitForSeconds(0.33f);
         void OnClickCard(UICard a_uiCard)
         {
-            m_currentOpenedCard.Add(a_uiCard);
+            m_currentOpenedCards.Add(a_uiCard);
             m_onClickCard?.Invoke(a_uiCard.IconType);
+        }
+        IEnumerator IE_HideCurrentFlippedCards(List<UICard> a_cards)
+        {
+            yield return m_iWaitForHideClearTime;
+            foreach (UICard i_card in a_cards)
+            {
+                i_card.FlipToHideIcon();
+            }
+        }
+        IEnumerator IE_ClearCurrentFlippedCards(List<UICard> a_cards)
+        {
+            yield return m_iWaitForHideClearTime;
+            foreach (UICard i_card in a_cards)
+            {
+                i_card.Clear();
+            }
         }
         #endregion
 
@@ -176,7 +189,6 @@ namespace UI.Grid
             return l_card;
         }
         #endregion
-
     }
 
 }

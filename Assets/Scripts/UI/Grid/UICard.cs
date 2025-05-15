@@ -3,6 +3,7 @@ using Manager.Level;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections;
 namespace UI.Grid
 {
     /// <summary>
@@ -14,6 +15,15 @@ namespace UI.Grid
         TextMeshProUGUI m_textCardType = null;
         [SerializeField]
         Image m_image = null;
+        [SerializeField]
+        Animation m_animation = null;
+
+        const string SHOW_ICON_ANIM_NAME = "FlipToShowIcon";
+        const string HIDE_ICON_ANIM_NAME = "FlipToHideIcon";
+        const float SHOW_ICON_ANIM_LENGTH = 0.33f;
+        const float HIDE_ICON_ANIM_LENGTH = 0.33f;
+
+        WaitForSeconds m_waitForShowAnimTime = new WaitForSeconds(SHOW_ICON_ANIM_LENGTH), m_waitForHideAnimTime = new WaitForSeconds(HIDE_ICON_ANIM_LENGTH);
 
         IconType m_currentIconType = IconType.None;
 
@@ -70,7 +80,7 @@ namespace UI.Grid
             {
                 return;
             }
-            m_textCardType.gameObject.SetActive(true);
+            m_animation.Play(SHOW_ICON_ANIM_NAME);
             m_bIsIconVisible = true;
         }
 
@@ -83,9 +93,13 @@ namespace UI.Grid
             {
                 return;
             }
-            m_textCardType.gameObject.SetActive(false);
+            m_animation.Play(HIDE_ICON_ANIM_NAME);
+            StartCoroutine(IE_FlipToHideIcon());
+        }
+        IEnumerator IE_FlipToHideIcon()
+        {
+            yield return m_waitForHideAnimTime;
             m_bIsIconVisible = false;
-
         }
 
         /// <summary>
@@ -117,6 +131,14 @@ namespace UI.Grid
             }
             FlipToShowIcon();
             m_onClick?.Invoke(this);
+        }
+        public void OnReachRotation90_ShowAnim()
+        {
+            m_textCardType.gameObject.SetActive(true);
+        }
+        public void OnReachRotation90_HideAnim()
+        {
+            m_textCardType.gameObject.SetActive(false);
         }
     }
 }
