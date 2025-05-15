@@ -1,8 +1,7 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using Manager.UI;
 using UI.Grid;
+using UI.Menu;
 using UnityEngine;
 namespace Manager.Level
 {
@@ -21,10 +20,10 @@ namespace Manager.Level
             }
             LoadScriptableObjectData();
         }
-
         void Start()
         {
-            StartLevel(m_allLevelData.m_levels[3]);
+            IUIMenuRef.LoadData(m_allLevelData.m_levels);
+            IUIMenuRef.Show();
         }
 
         public void StartLevel(string a_levelName)
@@ -64,7 +63,7 @@ namespace Manager.Level
                     if (m_iMatchNeededToClear == m_iCurrentOpenedCards)
                     {
                         // clear the cards, combo is correct
-                        IUIGrid.ClearCurrentFlippedCards();
+                        IUIGridRef.ClearCurrentFlippedCards();
                         m_dictRemainingIconCount[a_type] -= m_iMatchNeededToClear;
                         m_iCurrentOpenedCards = 0;
                         m_currentOpenIconType = IconType.None;
@@ -73,7 +72,7 @@ namespace Manager.Level
                 else
                 {
                     // incorrect combo, flip the cards
-                    IUIGrid.HideCurrentFlippedCards();
+                    IUIGridRef.HideCurrentFlippedCards();
                     m_iCurrentOpenedCards = 0;
                     m_currentOpenIconType = IconType.None;
                 }
@@ -82,7 +81,8 @@ namespace Manager.Level
         }
         void LoadCurrentLevelData()
         {
-            IUIGrid.LoadGrid(m_currentLoadedLevel.m_iRows, m_currentLoadedLevel.m_iColumns, m_currentLoadedLevel.m_icons, OnCardClick);
+            IUIGridRef.LoadGrid(m_currentLoadedLevel.m_iRows, m_currentLoadedLevel.m_iColumns, m_currentLoadedLevel.m_icons, OnCardClick);
+            IUIGridRef.Show();
             m_dictRemainingIconCount.Clear();
             foreach (IconType i_iconType in m_currentLoadedLevel.m_icons)
             {
@@ -101,18 +101,18 @@ namespace Manager.Level
             }
             m_iMatchNeededToClear = m_currentLoadedLevel.m_iMatchNeededToClear;
         }
-        bool CheckForLevelComplete()
+        void CheckForLevelComplete()
         {
             foreach (IconType i_key in m_dictRemainingIconCount.Keys)
             {
                 if (m_dictRemainingIconCount[i_key] > 0)
                 {
-                    Debug.Log("Level Not Competed");
-                    return false;
+                    return;
                 }
             }
-            Debug.Log("Level Completed");
-            return true;
+            IUIGridRef.Hide();
+            IUIGridRef.ClearGrid();
+            IUIMenuRef.Show();
         }
         #endregion
 
@@ -127,16 +127,28 @@ namespace Manager.Level
         #endregion
 
         #region UI References
-        IUIGrid m_iUIGrid = null;
-        IUIGrid IUIGrid
+        IUIGrid m_iUIGridRef = null;
+        IUIGrid IUIGridRef
         {
             get
             {
-                if (m_iUIGrid == null)
+                if (m_iUIGridRef == null)
                 {
-                    m_iUIGrid = (IUIGrid)UIManager.instance.GetUI(UIGrid.UI_ID);
+                    m_iUIGridRef = (IUIGrid)UIManager.instance.GetUI(UIGrid.UI_ID);
                 }
-                return m_iUIGrid;
+                return m_iUIGridRef;
+            }
+        }
+        IUIMenu m_iUIMenuRef = null;
+        IUIMenu IUIMenuRef
+        {
+            get
+            {
+                if (m_iUIMenuRef == null)
+                {
+                    m_iUIMenuRef = (IUIMenu)UIManager.instance.GetUI(UIMenu.UI_ID);
+                }
+                return m_iUIMenuRef;
             }
         }
         #endregion

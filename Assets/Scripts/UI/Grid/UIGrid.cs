@@ -67,7 +67,8 @@ namespace UI.Grid
         }
         void IUIGrid.ClearGrid()
         {
-            foreach (UICard i_card in m_pooledOutCards)
+            List<UICard> l_cards = new List<UICard>(m_pooledOutCards);
+            foreach (UICard i_card in l_cards)
             {
                 i_card.Reset();
                 i_card.Disable();
