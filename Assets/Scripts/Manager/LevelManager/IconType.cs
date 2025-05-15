@@ -1,9 +1,12 @@
-public enum IconType
+namespace Manager.Level
 {
-    None,
-    A,
-    B,
-    C,
-    D,
-    E
+    public enum IconType
+    {
+        None,
+        A,
+        B,
+        C,
+        D,
+        E
+    }
 }

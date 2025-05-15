@@ -1,0 +1,182 @@
+using System;
+using System.Collections.Generic;
+using Manager.Level;
+using Manager.UI;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace UI.Grid
+{
+    public class UIGrid : MonoBehaviour, IUIGrid
+    {
+        public const string UI_ID = "UIGrid";
+        [SerializeField]
+        Canvas m_canvas = null;
+        [SerializeField]
+        GraphicRaycaster m_graphicRaycaster = null;
+
+        [SerializeField]
+        GridLayoutGroup m_gridLayoutGroup = null;
+
+        [SerializeField]
+        UICard m_uiCardPrefab = null;
+
+        void Awake()
+        {
+            UIManager.instance.RegisterUI(UI_ID, this);
+            LoadPool();
+        }
+        void OnDestroy()
+        {
+            if (UIManager.instance != null)
+            {
+                UIManager.instance.UnRegisterUI(UI_ID);
+            }
+        }
+
+
+        #region interface implementation
+        void IGlobalUI.Show(Action a_callback)
+        {
+            m_canvas.enabled = true;
+            m_graphicRaycaster.enabled = true;
+            a_callback?.Invoke();
+        }
+        void IGlobalUI.Hide(Action a_callback)
+        {
+            m_canvas.enabled = false;
+            m_graphicRaycaster.enabled = false;
+            a_callback?.Invoke();
+        }
+        void IGlobalUI.SetInteractable(bool a_bIsInteractable)
+        {
+            m_graphicRaycaster.enabled = a_bIsInteractable;
+        }
+        void IUIGrid.LoadGrid(int a_iRows, int a_iColumns, List<IconType> a_icons, Action<IconType> a_onCardClicked)
+        {
+            TuneGridLayoutProperties(a_iColumns);
+            foreach (IconType i_iconType in a_icons)
+            {
+                UICard l_uiCard = GetUICardFromPool();
+                l_uiCard.LoadData(i_iconType, OnClickCard);
+                l_uiCard.Enable();
+            }
+            m_onClickCard = a_onCardClicked;
+        }
+        void IUIGrid.ClearGrid()
+        {
+            foreach (UICard i_card in m_pooledOutCards)
+            {
+                i_card.Reset();
+                i_card.Disable();
+                ReturnToPool(i_card);
+            }
+        }
+        void IUIGrid.HideCurrentFlippedCards()
+        {
+            foreach (UICard i_card in m_currentOpenedCard)
+            {
+                i_card.FlipToHideIcon();
+            }
+            m_currentOpenedCard.Clear();
+        }
+        void IUIGrid.ClearCurrentFlippedCards()
+        {
+            foreach (UICard i_card in m_currentOpenedCard)
+            {
+                i_card.Clear();
+            }
+            m_currentOpenedCard.Clear();
+        }
+        #endregion
+
+
+        #region Card Interaction
+        List<UICard> m_currentOpenedCard = new List<UICard>();
+        Action<IconType> m_onClickCard = null;
+        void OnClickCard(UICard a_uiCard)
+        {
+            m_currentOpenedCard.Add(a_uiCard);
+            m_onClickCard?.Invoke(a_uiCard.IconType);
+        }
+        #endregion
+
+
+        #region Grid Tuning
+        int m_iRefWidth = 1080, m_iCellSpacing = 20, m_iLeftRightExtra = 150;
+        Vector2 m_v2Size200 = new Vector2(200, 200);
+
+        /// <summary>
+        /// Set grid sizes as per level data
+        /// </summary>
+        /// <param name="a_iColumns">number of columns</param>
+        void TuneGridLayoutProperties(int a_iColumns)
+        {
+            m_gridLayoutGroup.constraintCount = a_iColumns;
+            if (a_iColumns > 4)
+            {
+                int l_cellSize = (m_iRefWidth - m_iLeftRightExtra - (m_iCellSpacing * a_iColumns)) / a_iColumns;
+                m_gridLayoutGroup.cellSize = Vector2.one * l_cellSize;
+            }
+            else
+            {
+                m_gridLayoutGroup.cellSize = m_v2Size200;
+            }
+        }
+        #endregion
+
+
+        #region Cards Pool
+        [SerializeField]
+        List<UICard> m_initialCards = null;
+        Queue<UICard> m_cardPool = new Queue<UICard>();
+        List<UICard> m_pooledOutCards = new List<UICard>();
+
+        /// <summary>
+        /// initialize pool quese
+        /// </summary>
+        void LoadPool()
+        {
+            m_cardPool.Clear();
+            foreach (UICard i_card in m_initialCards)
+            {
+                m_cardPool.Enqueue(i_card);
+            }
+        }
+
+        /// <summary>
+        /// Get object from pool
+        /// </summary>
+        /// <returns>UICard</returns>
+        UICard GetUICardFromPool()
+        {
+            UICard a_uiCard = (m_cardPool.Count > 0) ? m_cardPool.Dequeue() : GenerateCard();
+            m_pooledOutCards.Add(a_uiCard);
+            return a_uiCard;
+        }
+
+        /// <summary>
+        /// Put object back into pool
+        /// </summary>
+        /// <param name="a_uiCard">UICard</param>
+        void ReturnToPool(UICard a_uiCard)
+        {
+            m_cardPool.Enqueue(a_uiCard);
+            m_pooledOutCards.Remove(a_uiCard);
+        }
+
+        /// <summary>
+        /// Generate card, if pool is empty
+        /// </summary>
+        /// <returns>UICard</returns>
+        UICard GenerateCard()
+        {
+            UICard l_card = Instantiate(m_uiCardPrefab, m_gridLayoutGroup.transform);
+            l_card.transform.localScale = Vector3.one;
+            return l_card;
+        }
+        #endregion
+
+    }
+
+}

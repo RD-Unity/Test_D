@@ -3,6 +3,7 @@
 <!-- icon count must match rows * column multiplication -->
 <!-- grid generation is left to right and top to bottom for icon list -->
 <!-- type's value should match with enum values of "Assets\Scripts\Manager\LevelManager\IconType.cs" -->
+<!-- 'match_needed_to_clear' must be greater or equal to 2 -->
 <Levels>
     <Level name_id="Level 1" rows="2" column="2" match_needed_to_clear ="2">
         <Icon type="A" />

@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Xml;
 using System.IO;
-using Unity.VisualScripting;
-
-
 
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+
 namespace Manager.Level
 {
     public class LevelData : ScriptableObject
@@ -21,15 +19,19 @@ namespace Manager.Level
         private const string INPUT_PATH = "/LevelDataXMLs/LevelData.xml";
         private const string OUTPUT_PATH = "Assets/Resources/ScriptableObjects/LevelData/LevelData.asset";
 
-        private static string KEY_ROWS = "rows";
-        private static string KEY_COLUMNS = "column";
-        private static string KEY_TYPE = "type";
-        private static string KEY_ICON = "Icon";
-        private static string KEY_LEVELS = "/Levels";
-        private static string KEY_LEVEL = "Level";
-        private static string KEY_NAME_ID = "name_id";
-        private static string KEY_MATCH_NEEDED_TO_CLEAR = "match_needed_to_clear";
+        private const string KEY_ROWS = "rows";
+        private const string KEY_COLUMNS = "column";
+        private const string KEY_TYPE = "type";
+        private const string KEY_ICON = "Icon";
+        private const string KEY_LEVELS = "/Levels";
+        private const string KEY_LEVEL = "Level";
+        private const string KEY_NAME_ID = "name_id";
+        private const string KEY_MATCH_NEEDED_TO_CLEAR = "match_needed_to_clear";
 
+
+        /// <summary>
+        /// Validate and create level data scriptable object
+        /// </summary>
         [MenuItem("LevelData/Check N Create Asset")]
         static void CheckNCreateAsset()
         {
@@ -50,6 +52,14 @@ namespace Manager.Level
                 int l_columns = int.Parse(l_nodeLevel.Attributes[KEY_COLUMNS].Value);
                 int l_matchNeededToClear = int.Parse(l_nodeLevel.Attributes[KEY_MATCH_NEEDED_TO_CLEAR].Value);
                 string l_strName = l_nodeLevel.Attributes[KEY_NAME_ID].Value;
+
+                if (l_matchNeededToClear < 2)
+                {
+                    Debug.LogError("CheckNCreateAsset::'match_needed_to_clear' is lesser than 2 for level '" + l_strName + "'");
+
+                    continue;
+                }
+
                 XmlElement l_nodeEle = (XmlElement)l_nodeLevel;
                 XmlNodeList l_xmlIconList = l_nodeEle.GetElementsByTagName(KEY_ICON);
                 if (l_xmlIconList.Count != (l_rows * l_columns))
@@ -57,6 +67,7 @@ namespace Manager.Level
                     Debug.LogError("CheckNCreateAsset :: icon count miss match for level '" + l_strName + "'");
                     continue;
                 }
+
                 List<IconType> l_icons = new List<IconType>();
                 m_iconCountData.Clear();
                 foreach (XmlNode l_iconNode in l_xmlIconList)
@@ -116,14 +127,33 @@ namespace Manager.Level
     [Serializable]
     public class Level
     {
+        /// <summary>
+        /// Level ID
+        /// </summary> 
         [SerializeField]
         public string m_strLevelID = string.Empty;
+
+        /// <summary>
+        /// Number of rows
+        /// </summary>
         [SerializeField]
         public int m_iRows = 0;
+
+        /// <summary>
+        /// Number of Columns
+        /// </summary>
         [SerializeField]
         public int m_iColumns = 0;
+
+        /// <summary>
+        /// how many match needed to clear the cards
+        /// </summary>
         [SerializeField]
         public int m_iMatchNeededToClear = 0;
+
+        /// <summary>
+        /// grid detail, from left to right, top to bottom
+        /// </summary>
         [SerializeField]
         public List<IconType> m_icons = null;
     }

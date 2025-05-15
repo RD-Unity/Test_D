@@ -1,18 +1,153 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Manager.UI;
+using UI.Grid;
 using UnityEngine;
-
-public class LevelManager : MonoBehaviour
+namespace Manager.Level
 {
-    // Start is called before the first frame update
-    void Start()
+    public class LevelManager : MonoBehaviour
     {
-        
-    }
+        public static LevelManager instance { get; private set; }
+        void Awake()
+        {
+            if (instance != null && instance != this)
+            {
+                Destroy(this);
+            }
+            else
+            {
+                instance = this;
+            }
+            LoadScriptableObjectData();
+        }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        void Start()
+        {
+            StartLevel(m_allLevelData.m_levels[3]);
+        }
+
+        public void StartLevel(string a_levelName)
+        {
+            foreach (Level i_level in m_allLevelData.m_levels)
+            {
+                if (i_level.m_strLevelID.Equals(a_levelName))
+                {
+                    StartLevel(i_level);
+                    return;
+                }
+            }
+        }
+        public void StartLevel(Level a_level)
+        {
+            m_currentLoadedLevel = a_level;
+            LoadCurrentLevelData();
+        }
+
+        #region Current Level Handling
+        Level m_currentLoadedLevel = null;
+        Dictionary<IconType, int> m_dictRemainingIconCount = new Dictionary<IconType, int>();
+        int m_iMatchNeededToClear = 0;
+        int m_iCurrentOpenedCards = 0;
+        IconType m_currentOpenIconType = IconType.None;
+        void OnCardClick(IconType a_type)
+        {
+            m_iCurrentOpenedCards++;
+            if (m_iCurrentOpenedCards == 1)
+            {
+                m_currentOpenIconType = a_type;
+            }
+            else
+            {
+                if (a_type == m_currentOpenIconType)
+                {
+                    if (m_iMatchNeededToClear == m_iCurrentOpenedCards)
+                    {
+                        // clear the cards, combo is correct
+                        IUIGrid.ClearCurrentFlippedCards();
+                        m_dictRemainingIconCount[a_type] -= m_iMatchNeededToClear;
+                        m_iCurrentOpenedCards = 0;
+                        m_currentOpenIconType = IconType.None;
+                    }
+                }
+                else
+                {
+                    // incorrect combo, flip the cards
+
+                    m_iCurrentOpenedCards = 0;
+                    m_currentOpenIconType = IconType.None;
+                    StartCoroutine(FlipToHideCurrentOpenedCard());
+                }
+            }
+            CheckForLevelComplete();
+        }
+        void LoadCurrentLevelData()
+        {
+            IUIGrid.LoadGrid(m_currentLoadedLevel.m_iRows, m_currentLoadedLevel.m_iColumns, m_currentLoadedLevel.m_icons, OnCardClick);
+            m_dictRemainingIconCount.Clear();
+            foreach (IconType i_iconType in m_currentLoadedLevel.m_icons)
+            {
+                if (i_iconType == IconType.None)
+                {
+                    continue;
+                }
+                if (m_dictRemainingIconCount.ContainsKey(i_iconType))
+                {
+                    m_dictRemainingIconCount[i_iconType]++;
+                }
+                else
+                {
+                    m_dictRemainingIconCount.Add(i_iconType, 1);
+                }
+            }
+            m_iMatchNeededToClear = m_currentLoadedLevel.m_iMatchNeededToClear;
+        }
+        bool CheckForLevelComplete()
+        {
+            foreach (IconType i_key in m_dictRemainingIconCount.Keys)
+            {
+                if (m_dictRemainingIconCount[i_key] > 0)
+                {
+                    Debug.Log("Level Not Competed");
+                    return false;
+                }
+            }
+            Debug.Log("Level Completed");
+            return true;
+        }
+
+        WaitForSeconds m_waitForFlipToHide = new WaitForSeconds(0.5f);
+        IEnumerator FlipToHideCurrentOpenedCard()
+        {
+            yield return m_waitForFlipToHide;
+            IUIGrid.HideCurrentFlippedCards();
+        }
+        #endregion
+
+
+        #region All Level Data
+        const string RESOURCES_PATH = "ScriptableObjects/LevelData/LevelData";
+        LevelData m_allLevelData = null;
+        void LoadScriptableObjectData()
+        {
+            m_allLevelData = (LevelData)Resources.Load(RESOURCES_PATH);
+        }
+        #endregion
+
+        #region UI References
+        IUIGrid m_iUIGrid = null;
+        IUIGrid IUIGrid
+        {
+            get
+            {
+                if (m_iUIGrid == null)
+                {
+                    m_iUIGrid = (IUIGrid)UIManager.instance.GetUI(UIGrid.UI_ID);
+                }
+                return m_iUIGrid;
+            }
+        }
+        #endregion
+
     }
 }
