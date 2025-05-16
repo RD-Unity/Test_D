@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using Manager.Save;
 using Manager.Score;
@@ -52,6 +53,7 @@ namespace Manager.Level
         {
             m_currentLoadedLevel = a_level;
             LoadCurrentLevelData();
+            StopAllCoroutines();
         }
 
         #region Current Level Handling
@@ -98,10 +100,6 @@ namespace Manager.Level
             {
                 m_saveData.m_bIsLevelInProgress = false;
                 SoundManager.instance.PlaySFX(LEVEL_COMPLETE_SFX_KEY);
-                IUIGridRef.Hide();
-                IUIGameHUDRef.Hide();
-                IUIGridRef.ClearGrid();
-                IUIMenuRef.Show();
                 int l_flipCount = ScoreManager.instance.GetFlipCount();
                 int l_bestFlipCount = ScoreManager.instance.GetBestFlipCount();
                 if (l_flipCount < l_bestFlipCount)
@@ -109,8 +107,18 @@ namespace Manager.Level
                     ScoreManager.instance.SetBestFlipCount(l_flipCount);
                     m_saveData.m_iBestFlipCount = l_flipCount;
                 }
+                StartCoroutine(IE_WaitForBackToMenuAfterLevelComplete());
             }
             SaveData();
+        }
+        WaitForSeconds m_waitForHalfSeconds = new WaitForSeconds(1f);
+        IEnumerator IE_WaitForBackToMenuAfterLevelComplete()
+        {
+            yield return m_waitForHalfSeconds;
+            IUIGridRef.Hide();
+            IUIGameHUDRef.Hide();
+            IUIGridRef.ClearGrid();
+            IUIMenuRef.Show();
         }
         void LoadCurrentLevelData()
         {
