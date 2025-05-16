@@ -48,6 +48,7 @@ namespace UI.Grid
         }
         void IGlobalUI.Hide(Action a_callback)
         {
+            StopAllCoroutines();
             m_canvas.enabled = false;
             m_graphicRaycaster.enabled = false;
             a_callback?.Invoke();

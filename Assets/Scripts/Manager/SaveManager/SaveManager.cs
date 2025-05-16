@@ -45,13 +45,46 @@ namespace Manager.Save
     }
     public class SaveData
     {
+        /// <summary>
+        /// opened card count on grid
+        /// </summary>
         [SerializeField]
         public int m_iCurrentOpenedCards = 0;
+
+        /// <summary>
+        /// current opened icon
+        /// </summary> 
         [SerializeField]
         public IconType m_currentOpenIconType = IconType.None;
+
+        /// <summary>
+        /// data of remaining icons in the grid
+        /// </summary>
         [SerializeField]
         public Dictionary<IconType, int> m_dictRemainingIconCount = null;
+
+        /// <summary>
+        /// current grid icon status
+        /// </summary>
         [SerializeField]
         public List<CardIconStatus> m_gridIconStatus = null;
+
+        /// <summary>
+        /// current score
+        /// </summary>
+        [SerializeField]
+        public int m_iCurrentFlipCount = 0;
+
+        /// <summary>
+        /// best score
+        /// </summary>
+        [SerializeField]
+        public int m_iBestFlipCount = int.MaxValue;
+
+        /// <summary>
+        /// whether level is in progress
+        /// </summary>
+        [SerializeField]
+        public bool m_bIsLevelInProgress = false;
     }
 }

@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using Manager.Save;
+using Manager.Score;
 using Manager.Sound;
 using Manager.UI;
+using UI.GameHUD;
 using UI.Grid;
 using UI.Menu;
-using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 namespace Manager.Level
 {
     public class LevelManager : MonoBehaviour
@@ -61,6 +63,8 @@ namespace Manager.Level
         SaveData m_saveData = null;
         void OnCardClick(IconType a_type)
         {
+            ScoreManager.instance.IncreaseFlipCount();
+            m_saveData.m_bIsLevelInProgress = true;
             m_iCurrentOpenedCards++;
             if (m_iCurrentOpenedCards == 1)
             {
@@ -92,21 +96,26 @@ namespace Manager.Level
 
             if (CheckForLevelComplete())
             {
+                m_saveData.m_bIsLevelInProgress = false;
                 SoundManager.instance.PlaySFX(LEVEL_COMPLETE_SFX_KEY);
                 IUIGridRef.Hide();
+                IUIGameHUDRef.Hide();
                 IUIGridRef.ClearGrid();
                 IUIMenuRef.Show();
-                DeleteSavedData();
+                int l_flipCount = ScoreManager.instance.GetFlipCount();
+                int l_bestFlipCount = ScoreManager.instance.GetBestFlipCount();
+                if (l_flipCount < l_bestFlipCount)
+                {
+                    ScoreManager.instance.SetBestFlipCount(l_flipCount);
+                    m_saveData.m_iBestFlipCount = l_flipCount;
+                }
             }
-            else
-            {
-                SaveData();
-            }
+            SaveData();
         }
         void LoadCurrentLevelData()
         {
             m_saveData = SaveManager.Load(m_currentLoadedLevel.m_strLevelID);
-            if (m_saveData == null)
+            if (m_saveData == null || !m_saveData.m_bIsLevelInProgress)
             {
                 IUIGridRef.LoadGrid(m_currentLoadedLevel.m_iRows, m_currentLoadedLevel.m_iColumns, m_currentLoadedLevel.m_icons, OnCardClick);
                 m_dictRemainingIconCount.Clear();
@@ -125,7 +134,11 @@ namespace Manager.Level
                         m_dictRemainingIconCount.Add(i_iconType, 1);
                     }
                 }
-                m_saveData = new SaveData();
+                ScoreManager.instance.Reset();
+                if (m_saveData == null)
+                    m_saveData = new SaveData();
+                else
+                    ScoreManager.instance.SetBestFlipCount(m_saveData.m_iBestFlipCount);
             }
             else
             {
@@ -133,8 +146,12 @@ namespace Manager.Level
                 m_dictRemainingIconCount = m_saveData.m_dictRemainingIconCount;
                 m_iCurrentOpenedCards = m_saveData.m_iCurrentOpenedCards;
                 m_currentOpenIconType = m_saveData.m_currentOpenIconType;
+                ScoreManager.instance.SetFlipCount(m_saveData.m_iCurrentFlipCount);
+                ScoreManager.instance.SetBestFlipCount(m_saveData.m_iBestFlipCount);
             }
             IUIGridRef.Show();
+            IUIGameHUDRef.Show();
+            IUIGameHUDRef.SetMatchNeededValue(m_currentLoadedLevel.m_iMatchNeededToClear);
             m_iMatchNeededToClear = m_currentLoadedLevel.m_iMatchNeededToClear;
         }
         bool CheckForLevelComplete()
@@ -154,11 +171,8 @@ namespace Manager.Level
             m_saveData.m_currentOpenIconType = m_currentOpenIconType;
             m_saveData.m_dictRemainingIconCount = m_dictRemainingIconCount;
             m_saveData.m_gridIconStatus = IUIGridRef.GetAllCardStatus();
+            m_saveData.m_iCurrentFlipCount = ScoreManager.instance.GetFlipCount();
             SaveManager.Save(m_currentLoadedLevel.m_strLevelID, m_saveData);
-        }
-        void DeleteSavedData()
-        {
-            SaveManager.DeleteSavedDataFile(m_currentLoadedLevel.m_strLevelID);
         }
         #endregion
 
@@ -195,6 +209,18 @@ namespace Manager.Level
                     m_iUIMenuRef = (IUIMenu)UIManager.instance.GetUI(UIMenu.UI_ID);
                 }
                 return m_iUIMenuRef;
+            }
+        }
+        IUIGameHUD m_iUIGameHUDRef = null;
+        IUIGameHUD IUIGameHUDRef
+        {
+            get
+            {
+                if (m_iUIGameHUDRef == null)
+                {
+                    m_iUIGameHUDRef = (IUIGameHUD)UIManager.instance.GetUI(UIGameHUD.UI_ID);
+                }
+                return m_iUIGameHUDRef;
             }
         }
         #endregion
