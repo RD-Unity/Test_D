@@ -6,60 +6,60 @@
 <!-- 'match_needed_to_clear' must be greater or equal to 2 -->
 <Levels>
     <Level name_id="Level 1" rows="2" column="2" match_needed_to_clear ="2">
-        <Icon type="A" />
-        <Icon type="B" />
-        <Icon type="B" />
-        <Icon type="A" />
+        <Icon type="Cheburashka" />
+        <Icon type="Madagascar" />
+        <Icon type="Madagascar" />
+        <Icon type="Cheburashka" />
     </Level>
     <Level name_id="Level 2" rows="2" column="3" match_needed_to_clear ="2">
-        <Icon type="C" />
-        <Icon type="E" />
-        <Icon type="C" />
-        <Icon type="D" />
-        <Icon type="E" />
-        <Icon type="D" />
+        <Icon type="Mermaid" />
+        <Icon type="Woodpecker" />
+        <Icon type="Mermaid" />
+        <Icon type="Smurf" />
+        <Icon type="Woodpecker" />
+        <Icon type="Smurf" />
     </Level>
     <Level name_id="Level 3" rows="3" column="3" match_needed_to_clear ="2">
-        <Icon type="C" />
-        <Icon type="E" />
-        <Icon type="C" />
-        <Icon type="D" />
+        <Icon type="Mermaid" />
+        <Icon type="Woodpecker" />
+        <Icon type="Mermaid" />
+        <Icon type="Smurf" />
         <Icon type="None" />
-        <Icon type="E" />
-        <Icon type="D" />
-        <Icon type="B" />
-        <Icon type="B" />
+        <Icon type="Woodpecker" />
+        <Icon type="Smurf" />
+        <Icon type="Madagascar" />
+        <Icon type="Madagascar" />
     </Level>
     <Level name_id="Level 4" rows="5" column="6" match_needed_to_clear ="3">
-        <Icon type="C" />
-        <Icon type="E" />
-        <Icon type="C" />
-        <Icon type="D" />
-        <Icon type="E" />
-        <Icon type="D" />
-        <Icon type="A" />
-        <Icon type="B" />
-        <Icon type="C" />
-        <Icon type="B" />
-        <Icon type="E" />
-        <Icon type="D" />
-        <Icon type="C" />
-        <Icon type="A" />
-        <Icon type="C" />
-        <Icon type="D" />
-        <Icon type="E" />
-        <Icon type="A" />
-        <Icon type="C" />
-        <Icon type="A" />
-        <Icon type="A" />
-        <Icon type="B" />
-        <Icon type="B" />
-        <Icon type="D" />
-        <Icon type="B" />
-        <Icon type="E" />
-        <Icon type="A" />
-        <Icon type="D" />
-        <Icon type="E" />
-        <Icon type="B" />
+        <Icon type="Mermaid" />
+        <Icon type="Woodpecker" />
+        <Icon type="Mermaid" />
+        <Icon type="Smurf" />
+        <Icon type="Woodpecker" />
+        <Icon type="Smurf" />
+        <Icon type="Cheburashka" />
+        <Icon type="Madagascar" />
+        <Icon type="Mermaid" />
+        <Icon type="Madagascar" />
+        <Icon type="Woodpecker" />
+        <Icon type="Smurf" />
+        <Icon type="Mermaid" />
+        <Icon type="Cheburashka" />
+        <Icon type="Mermaid" />
+        <Icon type="Smurf" />
+        <Icon type="Woodpecker" />
+        <Icon type="Cheburashka" />
+        <Icon type="Mermaid" />
+        <Icon type="Cheburashka" />
+        <Icon type="Cheburashka" />
+        <Icon type="Madagascar" />
+        <Icon type="Madagascar" />
+        <Icon type="Smurf" />
+        <Icon type="Madagascar" />
+        <Icon type="Woodpecker" />
+        <Icon type="Cheburashka" />
+        <Icon type="Smurf" />
+        <Icon type="Woodpecker" />
+        <Icon type="Madagascar" />
     </Level>
 </Levels>

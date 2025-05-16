@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
+using Manager.Image;
 namespace UI.Grid
 {
     /// <summary>
@@ -12,7 +13,7 @@ namespace UI.Grid
     public class UICard : MonoBehaviour
     {
         [SerializeField]
-        TextMeshProUGUI m_textCardType = null;
+        Image m_imageCardIcon = null;
         [SerializeField]
         Image m_image = null;
         [SerializeField]
@@ -50,8 +51,8 @@ namespace UI.Grid
                 return;
             }
             m_onClick = a_onClick;
-            m_textCardType.text = m_currentIconType.ToString();
-            m_textCardType.gameObject.SetActive(false);
+            m_imageCardIcon.sprite = ImageManager.instance.GetSprite(m_currentIconType);
+            m_imageCardIcon.gameObject.SetActive(false);
             m_bIsIconVisible = false;
             m_image.enabled = true;
         }
@@ -90,7 +91,7 @@ namespace UI.Grid
             {
                 return;
             }
-            m_textCardType.gameObject.SetActive(true);
+            m_imageCardIcon.gameObject.SetActive(true);
             transform.eulerAngles = m_v3ShowIconCardRotation;
             m_bIsIconVisible = true;
         }
@@ -128,8 +129,8 @@ namespace UI.Grid
         public void Reset()
         {
             m_onClick = null;
-            m_textCardType.text = string.Empty;
-            m_textCardType.gameObject.SetActive(false);
+            m_imageCardIcon.sprite = null;
+            m_imageCardIcon.gameObject.SetActive(false);
             m_bIsIconVisible = false;
             m_image.enabled = true;
         }
@@ -145,11 +146,11 @@ namespace UI.Grid
         }
         public void OnReachRotation90_ShowAnim()
         {
-            m_textCardType.gameObject.SetActive(true);
+            m_imageCardIcon.gameObject.SetActive(true);
         }
         public void OnReachRotation90_HideAnim()
         {
-            m_textCardType.gameObject.SetActive(false);
+            m_imageCardIcon.gameObject.SetActive(false);
         }
     }
 }

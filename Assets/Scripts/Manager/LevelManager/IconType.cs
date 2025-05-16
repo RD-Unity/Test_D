@@ -3,10 +3,10 @@ namespace Manager.Level
     public enum IconType
     {
         None,
-        A,
-        B,
-        C,
-        D,
-        E
+        Cheburashka,
+        Madagascar,
+        Mermaid,
+        Smurf,
+        Woodpecker
     }
 }
