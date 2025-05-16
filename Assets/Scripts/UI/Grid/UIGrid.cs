@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Manager.Level;
+using Manager.Sound;
 using Manager.UI;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -12,6 +13,7 @@ namespace UI.Grid
     public class UIGrid : MonoBehaviour, IUIGrid
     {
         public const string UI_ID = "UIGrid";
+        const string CARD_FLIP_SFX_KEY = "flip_card";
         [SerializeField]
         Canvas m_canvas = null;
         [SerializeField]
@@ -62,8 +64,10 @@ namespace UI.Grid
                 UICard l_uiCard = GetUICardFromPool();
                 l_uiCard.LoadData(i_iconType, OnClickCard);
                 l_uiCard.Enable();
+                l_uiCard.FlipToShowIcon_Snap();
             }
             m_onClickCard = a_onCardClicked;
+            StartCoroutine(IE_HideAllCards());
         }
         void IUIGrid.ClearGrid()
         {
@@ -92,14 +96,17 @@ namespace UI.Grid
         List<UICard> m_currentOpenedCards = new List<UICard>();
         Action<IconType> m_onClickCard = null;
         WaitForSeconds m_iWaitForHideClearTime = new WaitForSeconds(0.33f);
+        WaitForSeconds m_iWaitForInitialShowTime = new WaitForSeconds(2f);
         void OnClickCard(UICard a_uiCard)
         {
             m_currentOpenedCards.Add(a_uiCard);
             m_onClickCard?.Invoke(a_uiCard.IconType);
+            SoundManager.instance.PlaySFX(CARD_FLIP_SFX_KEY);
         }
         IEnumerator IE_HideCurrentFlippedCards(List<UICard> a_cards)
         {
             yield return m_iWaitForHideClearTime;
+            SoundManager.instance.PlaySFX(CARD_FLIP_SFX_KEY);
             foreach (UICard i_card in a_cards)
             {
                 i_card.FlipToHideIcon();
@@ -112,6 +119,15 @@ namespace UI.Grid
             {
                 i_card.Clear();
             }
+        }
+        IEnumerator IE_HideAllCards()
+        {
+            yield return m_iWaitForInitialShowTime;
+            foreach (UICard i_card in m_pooledOutCards)
+            {
+                i_card.FlipToHideIcon();
+            }
+            SoundManager.instance.PlaySFX(CARD_FLIP_SFX_KEY);
         }
         #endregion
 

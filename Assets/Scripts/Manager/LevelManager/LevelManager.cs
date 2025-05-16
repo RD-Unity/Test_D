@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Manager.Sound;
 using Manager.UI;
 using UI.Grid;
 using UI.Menu;
@@ -7,6 +8,12 @@ namespace Manager.Level
 {
     public class LevelManager : MonoBehaviour
     {
+        const string CARD_MATCH_SFX_KEY = "card_match";
+        const string CARD_MISMATCH_SFX_KEY = "card_mismatch";
+        const string LEVEL_COMPLETE_SFX_KEY = "level_complete";
+        /// <summary>
+        /// Singleton instance
+        /// </summary>
         public static LevelManager instance { get; private set; }
         void Awake()
         {
@@ -63,6 +70,7 @@ namespace Manager.Level
                     if (m_iMatchNeededToClear == m_iCurrentOpenedCards)
                     {
                         // clear the cards, combo is correct
+                        SoundManager.instance.PlaySFX(CARD_MATCH_SFX_KEY);
                         IUIGridRef.ClearCurrentFlippedCards();
                         m_dictRemainingIconCount[a_type] -= m_iMatchNeededToClear;
                         m_iCurrentOpenedCards = 0;
@@ -72,6 +80,7 @@ namespace Manager.Level
                 else
                 {
                     // incorrect combo, flip the cards
+                    SoundManager.instance.PlaySFX(CARD_MISMATCH_SFX_KEY);
                     IUIGridRef.HideCurrentFlippedCards();
                     m_iCurrentOpenedCards = 0;
                     m_currentOpenIconType = IconType.None;
@@ -110,6 +119,7 @@ namespace Manager.Level
                     return;
                 }
             }
+            SoundManager.instance.PlaySFX(LEVEL_COMPLETE_SFX_KEY);
             IUIGridRef.Hide();
             IUIGridRef.ClearGrid();
             IUIMenuRef.Show();

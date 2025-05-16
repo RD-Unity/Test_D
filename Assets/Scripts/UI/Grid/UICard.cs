@@ -22,6 +22,7 @@ namespace UI.Grid
         const string HIDE_ICON_ANIM_NAME = "FlipToHideIcon";
         const float SHOW_ICON_ANIM_LENGTH = 0.33f;
         const float HIDE_ICON_ANIM_LENGTH = 0.33f;
+        Vector3 m_v3ShowIconCardRotation = Vector3.up * 180;
 
         WaitForSeconds m_waitForShowAnimTime = new WaitForSeconds(SHOW_ICON_ANIM_LENGTH), m_waitForHideAnimTime = new WaitForSeconds(HIDE_ICON_ANIM_LENGTH);
 
@@ -81,6 +82,16 @@ namespace UI.Grid
                 return;
             }
             m_animation.Play(SHOW_ICON_ANIM_NAME);
+            m_bIsIconVisible = true;
+        }
+        public void FlipToShowIcon_Snap()
+        {
+            if (m_bIsIconVisible)
+            {
+                return;
+            }
+            m_textCardType.gameObject.SetActive(true);
+            transform.eulerAngles = m_v3ShowIconCardRotation;
             m_bIsIconVisible = true;
         }
 
