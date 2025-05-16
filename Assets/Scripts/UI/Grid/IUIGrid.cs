@@ -16,6 +16,17 @@ namespace UI.Grid
         void LoadGrid(int a_iRows, int a_iColumns, List<IconType> a_icons, Action<IconType> a_onCardClicked);
 
         /// <summary>
+        /// Generate grid
+        /// </summary>
+        /// <param name="a_iRows">number of rows</param>
+        /// <param name="a_iColumns">number of columns</param>
+        /// <param name="a_icons">list of icons</param>
+        /// <param name="a_onCardClicked">callback on particular card clicked</param>
+        /// <param name="a_savedCardStatus">saved data</param>
+        void LoadGrid(int a_iRows, int a_iColumns, List<IconType> a_icons, Action<IconType> a_onCardClicked, List<CardIconStatus> a_savedData);
+
+
+        /// <summary>
         /// Clear the grid
         /// </summary>
         void ClearGrid();
@@ -29,5 +40,11 @@ namespace UI.Grid
         /// Clear the current opened cards, if combo happens
         /// </summary> 
         void ClearCurrentFlippedCards();
+
+        /// <summary>
+        /// get list of card's current status
+        /// </summary>
+        /// <returns>list of card's status</returns>
+        List<CardIconStatus> GetAllCardStatus();
     }
 }

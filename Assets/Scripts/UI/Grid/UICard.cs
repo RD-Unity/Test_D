@@ -26,16 +26,21 @@ namespace UI.Grid
         Vector3 m_v3ShowIconCardRotation = Vector3.up * 180;
 
         WaitForSeconds m_waitForShowAnimTime = new WaitForSeconds(SHOW_ICON_ANIM_LENGTH), m_waitForHideAnimTime = new WaitForSeconds(HIDE_ICON_ANIM_LENGTH);
+        Action<UICard> m_onClick;
+        bool m_bIsIconVisible = false;
 
         IconType m_currentIconType = IconType.None;
-
         /// <summary>
         /// Current attached IconType
         /// </summary>
         public IconType IconType => m_currentIconType;
 
-        Action<UICard> m_onClick;
-        bool m_bIsIconVisible = false;
+        CardIconStatus m_cardIconStatus = CardIconStatus.Cleared;
+
+        /// <summary>
+        /// current icon status 
+        /// </summary>
+        public CardIconStatus CardIconStatus => m_cardIconStatus;
 
         /// <summary>
         /// Load Data to the card
@@ -44,9 +49,11 @@ namespace UI.Grid
         /// <param name="a_onClick">callback on click</param>
         public void LoadData(IconType a_iconType, Action<UICard> a_onClick)
         {
+            m_cardIconStatus = CardIconStatus.Hidden;
             m_currentIconType = a_iconType;
             if (m_currentIconType == IconType.None)
             {
+                m_cardIconStatus = CardIconStatus.Cleared;
                 Clear();
                 return;
             }
@@ -82,6 +89,7 @@ namespace UI.Grid
             {
                 return;
             }
+            m_cardIconStatus = CardIconStatus.Visible;
             m_animation.Play(SHOW_ICON_ANIM_NAME);
             m_bIsIconVisible = true;
         }
@@ -91,6 +99,7 @@ namespace UI.Grid
             {
                 return;
             }
+            m_cardIconStatus = CardIconStatus.Visible;
             m_imageCardIcon.gameObject.SetActive(true);
             transform.eulerAngles = m_v3ShowIconCardRotation;
             m_bIsIconVisible = true;
@@ -105,6 +114,7 @@ namespace UI.Grid
             {
                 return;
             }
+            m_cardIconStatus = CardIconStatus.Hidden;
             m_animation.Play(HIDE_ICON_ANIM_NAME);
             StartCoroutine(IE_FlipToHideIcon());
         }
@@ -133,6 +143,14 @@ namespace UI.Grid
             m_imageCardIcon.gameObject.SetActive(false);
             m_bIsIconVisible = false;
             m_image.enabled = true;
+            m_cardIconStatus = CardIconStatus.Cleared;
+        }
+        /// <summary>
+        /// change card status
+        /// </summary>
+        public void ChangeCardStatus(CardIconStatus a_cardIconStatus)
+        {
+            m_cardIconStatus = a_cardIconStatus;
         }
 
         public void OnClick()
@@ -152,5 +170,11 @@ namespace UI.Grid
         {
             m_imageCardIcon.gameObject.SetActive(false);
         }
+    }
+    public enum CardIconStatus
+    {
+        Hidden,
+        Visible,
+        Cleared,
     }
 }

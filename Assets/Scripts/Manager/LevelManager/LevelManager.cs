@@ -1,8 +1,10 @@
 using System.Collections.Generic;
+using Manager.Save;
 using Manager.Sound;
 using Manager.UI;
 using UI.Grid;
 using UI.Menu;
+using Unity.VisualScripting;
 using UnityEngine;
 namespace Manager.Level
 {
@@ -56,6 +58,7 @@ namespace Manager.Level
         int m_iMatchNeededToClear = 0;
         int m_iCurrentOpenedCards = 0;
         IconType m_currentOpenIconType = IconType.None;
+        SaveData m_saveData = null;
         void OnCardClick(IconType a_type)
         {
             m_iCurrentOpenedCards++;
@@ -86,43 +89,76 @@ namespace Manager.Level
                     m_currentOpenIconType = IconType.None;
                 }
             }
-            CheckForLevelComplete();
+
+            if (CheckForLevelComplete())
+            {
+                SoundManager.instance.PlaySFX(LEVEL_COMPLETE_SFX_KEY);
+                IUIGridRef.Hide();
+                IUIGridRef.ClearGrid();
+                IUIMenuRef.Show();
+                DeleteSavedData();
+            }
+            else
+            {
+                SaveData();
+            }
         }
         void LoadCurrentLevelData()
         {
-            IUIGridRef.LoadGrid(m_currentLoadedLevel.m_iRows, m_currentLoadedLevel.m_iColumns, m_currentLoadedLevel.m_icons, OnCardClick);
-            IUIGridRef.Show();
-            m_dictRemainingIconCount.Clear();
-            foreach (IconType i_iconType in m_currentLoadedLevel.m_icons)
+            m_saveData = SaveManager.Load(m_currentLoadedLevel.m_strLevelID);
+            if (m_saveData == null)
             {
-                if (i_iconType == IconType.None)
+                IUIGridRef.LoadGrid(m_currentLoadedLevel.m_iRows, m_currentLoadedLevel.m_iColumns, m_currentLoadedLevel.m_icons, OnCardClick);
+                m_dictRemainingIconCount.Clear();
+                foreach (IconType i_iconType in m_currentLoadedLevel.m_icons)
                 {
-                    continue;
+                    if (i_iconType == IconType.None)
+                    {
+                        continue;
+                    }
+                    if (m_dictRemainingIconCount.ContainsKey(i_iconType))
+                    {
+                        m_dictRemainingIconCount[i_iconType]++;
+                    }
+                    else
+                    {
+                        m_dictRemainingIconCount.Add(i_iconType, 1);
+                    }
                 }
-                if (m_dictRemainingIconCount.ContainsKey(i_iconType))
-                {
-                    m_dictRemainingIconCount[i_iconType]++;
-                }
-                else
-                {
-                    m_dictRemainingIconCount.Add(i_iconType, 1);
-                }
+                m_saveData = new SaveData();
             }
+            else
+            {
+                IUIGridRef.LoadGrid(m_currentLoadedLevel.m_iRows, m_currentLoadedLevel.m_iColumns, m_currentLoadedLevel.m_icons, OnCardClick, m_saveData.m_gridIconStatus);
+                m_dictRemainingIconCount = m_saveData.m_dictRemainingIconCount;
+                m_iCurrentOpenedCards = m_saveData.m_iCurrentOpenedCards;
+                m_currentOpenIconType = m_saveData.m_currentOpenIconType;
+            }
+            IUIGridRef.Show();
             m_iMatchNeededToClear = m_currentLoadedLevel.m_iMatchNeededToClear;
         }
-        void CheckForLevelComplete()
+        bool CheckForLevelComplete()
         {
             foreach (IconType i_key in m_dictRemainingIconCount.Keys)
             {
                 if (m_dictRemainingIconCount[i_key] > 0)
                 {
-                    return;
+                    return false;
                 }
             }
-            SoundManager.instance.PlaySFX(LEVEL_COMPLETE_SFX_KEY);
-            IUIGridRef.Hide();
-            IUIGridRef.ClearGrid();
-            IUIMenuRef.Show();
+            return true;
+        }
+        void SaveData()
+        {
+            m_saveData.m_iCurrentOpenedCards = m_iCurrentOpenedCards;
+            m_saveData.m_currentOpenIconType = m_currentOpenIconType;
+            m_saveData.m_dictRemainingIconCount = m_dictRemainingIconCount;
+            m_saveData.m_gridIconStatus = IUIGridRef.GetAllCardStatus();
+            SaveManager.Save(m_currentLoadedLevel.m_strLevelID, m_saveData);
+        }
+        void DeleteSavedData()
+        {
+            SaveManager.DeleteSavedDataFile(m_currentLoadedLevel.m_strLevelID);
         }
         #endregion
 

@@ -58,16 +58,46 @@ namespace UI.Grid
         }
         void IUIGrid.LoadGrid(int a_iRows, int a_iColumns, List<IconType> a_icons, Action<IconType> a_onCardClicked)
         {
+            m_currentGridCardStatus.Clear();
             TuneGridLayoutProperties(a_iColumns);
             foreach (IconType i_iconType in a_icons)
             {
                 UICard l_uiCard = GetUICardFromPool();
+                l_uiCard.transform.SetAsLastSibling();
                 l_uiCard.LoadData(i_iconType, OnClickCard);
                 l_uiCard.Enable();
-                l_uiCard.FlipToShowIcon_Snap();
+                if (i_iconType != IconType.None)
+                    l_uiCard.FlipToShowIcon_Snap();
+                m_currentGridCardStatus.Add(CardIconStatus.Cleared);
             }
             m_onClickCard = a_onCardClicked;
             StartCoroutine(IE_HideAllCards());
+        }
+        void IUIGrid.LoadGrid(int a_iRows, int a_iColumns, List<IconType> a_icons, Action<IconType> a_onCardClicked, List<CardIconStatus> a_savedData)
+        {
+            m_currentGridCardStatus.Clear();
+            TuneGridLayoutProperties(a_iColumns);
+            for (int i = 0; i < a_icons.Count; i++)
+            {
+                UICard l_uiCard = GetUICardFromPool();
+                l_uiCard.transform.SetAsLastSibling();
+                if (a_savedData[i] == CardIconStatus.Cleared)
+                {
+                    l_uiCard.Clear();
+                }
+                else
+                {
+                    l_uiCard.LoadData(a_icons[i], OnClickCard);
+                    if (a_savedData[i] == CardIconStatus.Visible)
+                    {
+                        l_uiCard.FlipToShowIcon_Snap();
+                        m_currentOpenedCards.Add(l_uiCard);
+                    }
+                }
+                l_uiCard.Enable();
+                m_currentGridCardStatus.Add(a_savedData[i]);
+            }
+            m_onClickCard = a_onCardClicked;
         }
         void IUIGrid.ClearGrid()
         {
@@ -81,13 +111,29 @@ namespace UI.Grid
         }
         void IUIGrid.HideCurrentFlippedCards()
         {
+            foreach (UICard i_card in m_currentOpenedCards)
+            {
+                i_card.ChangeCardStatus(CardIconStatus.Hidden);
+            }
             StartCoroutine(IE_HideCurrentFlippedCards(new List<UICard>(m_currentOpenedCards)));
             m_currentOpenedCards.Clear();
         }
         void IUIGrid.ClearCurrentFlippedCards()
         {
+            foreach (UICard i_card in m_currentOpenedCards)
+            {
+                i_card.ChangeCardStatus(CardIconStatus.Cleared);
+            }
             StartCoroutine(IE_ClearCurrentFlippedCards(new List<UICard>(m_currentOpenedCards)));
             m_currentOpenedCards.Clear();
+        }
+        List<CardIconStatus> IUIGrid.GetAllCardStatus()
+        {
+            for (int i = 0; i < m_pooledOutCards.Count; i++)
+            {
+                m_currentGridCardStatus[i] = m_pooledOutCards[i].CardIconStatus;
+            }
+            return m_currentGridCardStatus;
         }
         #endregion
 
@@ -97,6 +143,8 @@ namespace UI.Grid
         Action<IconType> m_onClickCard = null;
         WaitForSeconds m_iWaitForHideClearTime = new WaitForSeconds(0.33f);
         WaitForSeconds m_iWaitForInitialShowTime = new WaitForSeconds(2f);
+        List<CardIconStatus> m_currentGridCardStatus = new List<CardIconStatus>();
+
         void OnClickCard(UICard a_uiCard)
         {
             m_currentOpenedCards.Add(a_uiCard);
